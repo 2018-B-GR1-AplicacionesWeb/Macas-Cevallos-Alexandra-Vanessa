@@ -52,6 +52,8 @@ console.log(adrian.nombre);
 //null falsy
 //{} o new Date() es truthy
 //undefined falsy
+//undefined ll true
+//no ver for, while, switch
 if(""){
     console.log("Si");
 }else {
