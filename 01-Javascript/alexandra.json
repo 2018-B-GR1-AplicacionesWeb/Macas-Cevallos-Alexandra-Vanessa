@@ -1,7 +1,7 @@
 //definir un objeto
 //llave valor 0, valor que contenga
 //{} dos llaves un objeto
-{
+[{
   "nombre":"Adrian",
   "edad": 12,
   "sueldo": 12.2,
@@ -10,4 +10,4 @@
   "mascota": {
     "nombre":"Cachetes"
   }
-}
+}]
