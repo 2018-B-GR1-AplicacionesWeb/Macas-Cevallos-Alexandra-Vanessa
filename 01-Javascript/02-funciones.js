@@ -84,3 +84,4 @@ function primeraLetraEnMayuscula(texto) {
     return primeraLetraMayuscula + restoPalabra;
 }
 console.log(saludarEnUpperCase("adrian",primeraLetraEnMayuscula));
+
