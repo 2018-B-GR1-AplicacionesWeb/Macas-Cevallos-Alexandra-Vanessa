@@ -33,9 +33,7 @@ const nuevaPromesaEscritura = (contenidoLeido) => {
         }
     );
 };
-function appendFile(nombreArchivo, contenidoArchivo, promesa) {
-    fs.readFile(nombreArchivo, 'utf-8',
-}
+
 nuevaPromesaLectura
     .then(
         (contenidoArchivoLeido) => {

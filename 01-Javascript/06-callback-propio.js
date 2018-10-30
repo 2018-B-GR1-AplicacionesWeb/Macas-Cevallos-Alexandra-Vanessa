@@ -28,9 +28,11 @@ function appendFile(nombreArchivo, contenidoArchivo, callback) {
                         if (err) {
                             console.error('Error escribiendo');
                             totalArchivo = 'ERROR';
+                            //reject(error)
                         } else {
                             console.log('Archivo creado');
                             totalArchivo = contenidoArchivoLeido + contenidoArchivo;
+                            // resolve(enidoArchivoLeido + contenidoArchivo)
                         }
                     }
                 );
@@ -55,7 +57,7 @@ appendFile('06-texto.txt',
 // ['A','B','C']
 
 // 0-A.txt 'A'
-// 1-B.txt 'B'
+// sss.txt 'B'
 // 2-C.txt 'C'
 
 
