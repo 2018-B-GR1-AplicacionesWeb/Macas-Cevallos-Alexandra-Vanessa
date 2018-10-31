@@ -1,7 +1,7 @@
 // 07-promesas.js
 
 const fs = require('fs');
-
+/*
 const nuevaPromesaLectura = new Promise(
     (resolve) => {
         fs.readFile('06-texto23.txt', 'utf-8',
@@ -60,7 +60,7 @@ nuevaPromesaLectura
                         console.log('Algo malo paso', resultadoError);
                     }
                 );
-        }
+        });
 
 appendFile('07-texto.txt',
     '\n Promesa',
@@ -72,3 +72,12 @@ appendFile('07-texto.txt',
         }
     }
 );
+*/
+
+const funcionConCallback = function (parametros, ) {
+    return new promise(
+        (resolve, reject) => {
+            resolve();
+            Reject();
+        } );
+};
