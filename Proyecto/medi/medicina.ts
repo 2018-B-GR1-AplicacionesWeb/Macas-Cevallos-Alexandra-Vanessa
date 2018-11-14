@@ -107,7 +107,7 @@ class Orden{
      //   this.valor_detalle=this.cantidad*this.medi.precio;
     }
     public toString = () : string => {
-        let espacios:string = "                       ";
+        let espacios:string = "         ";
         return `${this.medi.tipo}${espacios.substring(this.medi.tipo.length)}${this.cantidad}${espacios.substring(String(this.cantidad).length)}`;
     }
 }
@@ -167,7 +167,7 @@ let preguntas_login = [
         message: 'Password:',
         name: 'clave',
         validate: function (answer) {
-            if (answer!=='admin') {
+            if (answer!=='1234') {
                 return 'Password required!';
             }
             return true;

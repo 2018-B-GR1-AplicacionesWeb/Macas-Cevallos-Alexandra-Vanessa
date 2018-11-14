@@ -64,7 +64,7 @@ class Orden {
     constructor(Medicina, cantidad) {
         this.valor_detalle = 0.0;
         this.toString = () => {
-            let espacios = "                       ";
+            let espacios = "         ";
             return `${this.medi.tipo}${espacios.substring(this.medi.tipo.length)}${this.cantidad}${espacios.substring(String(this.cantidad).length)}`;
         };
         this.medi = Medicina;
@@ -115,7 +115,7 @@ let preguntas_login = [
         message: 'Password:',
         name: 'clave',
         validate: function (answer) {
-            if (answer !== 'admin') {
+            if (answer !== '1234') {
                 return 'Password required!';
             }
             return true;
