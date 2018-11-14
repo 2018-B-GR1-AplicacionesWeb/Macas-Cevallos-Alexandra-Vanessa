@@ -86,13 +86,6 @@ GetData('DataBase/medicinas')
 
 
 // Entidades
-
-class Cliente{
-    Nombre:string;
-    email:string;
-}
-
-
 class Med{
     tipo:string;
 
@@ -107,19 +100,20 @@ class Orden{
     medi:Med;
     cantidad;
     valor_detalle=0.0;
-    constructor(pizza:Med, cantidad:Number) {
-        this.medi = pizza;
+
+    constructor(Medicina:Med, cantidad:Number) {
+        this.medi = Medicina;
         this.cantidad=cantidad;
      //   this.valor_detalle=this.cantidad*this.medi.precio;
     }
     public toString = () : string => {
-        let espacios:string = "            ";
+        let espacios:string = "                       ";
         return `${this.medi.tipo}${espacios.substring(this.medi.tipo.length)}${this.cantidad}${espacios.substring(String(this.cantidad).length)}`;
     }
 }
 
 class Pedido{
-    cliente:Cliente;
+
     ordenes:Orden[]=[];
     mostrar_ordenes(){
         this.ordenes.forEach(
@@ -133,24 +127,8 @@ class Pedido{
         );
     };
 
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
-
-//---------------PREGUNTAS
-
-// preguntas del menu principal
 let preguntasMenu = [
 
     {
@@ -178,7 +156,7 @@ let login = [
 
 ];
 
-let preguntas_login_administrador = [
+let preguntas_login = [
     {
         type: 'input',
         name: 'nickname',
@@ -197,11 +175,11 @@ let preguntas_login_administrador = [
     },
 ];
 
-let preguntas_crud = [
+let CRUD = [
     {
         type:"list",
         name:"crud_op",
-        message:"Que desea hacer",
+        message:"Escoja una opcion",
         choices: ['Consultar','Modificar','Eliminar','Nueva','salir'],
         validate:(respuesta)=>{
             if(respuesta.crud_op=='salir'){
@@ -213,39 +191,39 @@ let preguntas_crud = [
     }
 ];
 
-let pregunta_actualizar = [
+let actualizar = [
     {
         type:'input',
         name:"old",
-        message:"Ingrese tipo de medi a actualizar?"
+        message:"Ingrese nombre del medicamento?"
     },
     {
         type:'input',
         name:"nuevo",
-        message:"Ingrese el nuevo tipo de medi para reemplazar?"
+        message:"Ingrese el nuevo nombre de medicamento?"
     }
 ];
 
-let pregunta_eliminar = [
+let eliminar = [
     {
         type:"input",
         name:'borrar',
-        message:"Ingrese tipo de medi a eliminar?",
+        message:"Ingrese nombre de medicamento?",
 
     }
 ];
 
-let pregunta_insertar = [
+let insertar = [
     {
         type:"input",
         name:'insert',
-        message:"Ingrese tipo de medi a insertar?",
+        message:"Ingrese nombre de medicamento:",
 
     },
     {
         type:'input',
         name:"saldo",
-        message:"Ingrese el precio de medi para reemplazar?",
+        message:"Ingrese el precio:",
         validate: function( value ) {
             var valid = !isNaN(parseFloat(value));
             return valid || "Por favor ingrese un numero valido";
@@ -254,29 +232,19 @@ let pregunta_insertar = [
     }
 ];
 
-
-
-
-
-
-
-
-
-
-
-let preguntas_menu_secundario = [
+let menu_secundario = [
 
     {
         type: "list",
         name: "clase",
-        message: "Que clase de medi",
+        message: "medicamento",
         choices: medicinalis,
         filter:( val )=>{ return val.toLowerCase(); }
     },
     {
         type: "input",
         name: "cantidad",
-        message: "Cuantas necesitas",
+        message: "Cantidad",
         validate: function( value ) {
             var valid = !isNaN(parseFloat(value));
             return valid || "Por favor ingrese un numero valido";
@@ -286,7 +254,7 @@ let preguntas_menu_secundario = [
     {
         type:"confirm",
         name:"seguir",
-        message:"Desea algo mas?",
+        message:"Nueva compra?",
     },
 
 ];
@@ -303,7 +271,7 @@ function iniciar() {
                 if (respuestas.sesion == 'admin') {
                     // Menu administrador
                     inquirer
-                        .prompt(preguntas_login_administrador)
+                        .prompt(preguntas_login)
                         .then((respuestas) => {
                                 if (respuestas.clave) {
                                     menu_crud();
@@ -320,7 +288,7 @@ function iniciar() {
                                 if (respuestas.opciones != 'Salir') {
                                     console.log('Eliga una medi del menu:')
                                     let pedido = new Pedido();
-                                    pedir_pizza(pedido);
+                                    pedidos(pedido);
                                 }
                             }
                         );
@@ -335,7 +303,7 @@ function iniciar() {
 
 function menu_crud(){
     inquirer
-        .prompt(preguntas_crud)
+        .prompt(CRUD)
         .then((respuestas) => {
                 if (respuestas.crud_op === 'salir') {
                     console.log(respuestas.clave);
@@ -351,7 +319,7 @@ function menu_crud(){
                             break;
                         case 'Modificar':
                             inquirer
-                                .prompt(pregunta_actualizar)
+                                .prompt(actualizar)
                                 .then(
                                     (respuestas) => {
                                         //buscar y reemplazar
@@ -391,7 +359,7 @@ function menu_crud(){
                             break;
                         case 'Eliminar':
                             inquirer
-                                .prompt(pregunta_eliminar)
+                                .prompt(eliminar)
                                 .then(
                                     (respuestas) => {
                                         //buscar y reemplazar
@@ -435,7 +403,7 @@ function menu_crud(){
 
 
                             inquirer
-                                .prompt(pregunta_insertar)
+                                .prompt(insertar)
                                 .then((respuestas) => {
                                     console.log(respuestas);
                                   let  res1 = respuestas.insert;
@@ -478,24 +446,24 @@ function menu_crud(){
 }
 
 
-function pedir_pizza(pedido:Pedido) {
+function pedidos(pedido:Pedido) {
     inquirer
-        .prompt(preguntas_menu_secundario)
+        .prompt(menu_secundario)
         .then(
             (respuestas)=>{
 
 
-                let pizza = new Med(respuestas.clase);
+                let medicamento = new Med(respuestas.clase);
                 let cantidad = respuestas.cantidad
-                pedido.ordenes.push(new Orden(pizza,cantidad));
+                pedido.ordenes.push(new Orden(medicamento,cantidad));
 
                 if (respuestas.seguir){
-                    pedir_pizza(pedido)
+                    pedidos(pedido)
                 }else {
                     console.log('-------------------------------------------' +
                         '\nDetalle de la medicina solicitada\n' +
                         '-----------------------------------------\n'+
-                        'Detalle,Precio  Cantidad    \n' +
+                        'Detalle,$0.0 Cantidad    \n' +
                         '.............................')
                     pedido.mostrar_ordenes();
                     console.log("........................");
@@ -504,7 +472,4 @@ function pedir_pizza(pedido:Pedido) {
             }
         );
 }
-
-
-
 iniciar();

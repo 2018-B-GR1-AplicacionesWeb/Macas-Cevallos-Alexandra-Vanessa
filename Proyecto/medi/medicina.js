@@ -1,15 +1,15 @@
 var inquirer = require('inquirer');
-var rxjs = require('rxjs');
-var fs = require('fs');
-var map = require('rxjs/operators').map;
-var reduce = require('rxjs/operators').reduce;
+const rxjs = require('rxjs');
+const fs = require('fs');
+const map = require('rxjs/operators').map;
+const reduce = require('rxjs/operators').reduce;
 // Iniciando datos
-var AppendFile = function (nombreArchivo, contenido, replace) {
+const AppendFile = (nombreArchivo, contenido, replace) => {
     // @ts-ignore
-    return new Promise(function (resolve, reject) {
-        fs.readFile(nombreArchivo, 'utf-8', function (error, contenidoArchivo) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(nombreArchivo, 'utf-8', (error, contenidoArchivo) => {
             if (error) {
-                fs.writeFile(nombreArchivo, contenido, function (error) {
+                fs.writeFile(nombreArchivo, contenido, (error) => {
                     if (error) {
                         reject(error);
                     }
@@ -21,7 +21,7 @@ var AppendFile = function (nombreArchivo, contenido, replace) {
             else {
                 fs.writeFile(nombreArchivo, 
                 //contenidoArchivo+contenido,
-                replace == true ? contenido : contenidoArchivo + contenido, function (error) {
+                replace == true ? contenido : contenidoArchivo + contenido, (error) => {
                     if (error) {
                         reject(error);
                     }
@@ -34,10 +34,10 @@ var AppendFile = function (nombreArchivo, contenido, replace) {
     });
 };
 // Cargar datos
-var GetData = function (nombreArchivo) {
+const GetData = (nombreArchivo) => {
     // @ts-ignore
-    return new Promise(function (resolve, reject) {
-        fs.readFile(nombreArchivo, 'utf-8', function (error, contenidoArchivo) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(nombreArchivo, 'utf-8', (error, contenidoArchivo) => {
             if (error) {
                 reject(error);
             }
@@ -47,54 +47,43 @@ var GetData = function (nombreArchivo) {
         });
     });
 };
-var medicinalis = [];
+let medicinalis = [];
 GetData('DataBase/medicinas')
-    .then(function (contenido) {
-    String(contenido).split("||").forEach(function (value) {
+    .then((contenido) => {
+    String(contenido).split("||").forEach((value) => {
         medicinalis.push(value);
     });
 });
 // Entidades
-var Cliente = /** @class */ (function () {
-    function Cliente() {
-    }
-    return Cliente;
-}());
-var Med = /** @class */ (function () {
-    function Med(tipo) {
+class Med {
+    constructor(tipo) {
         this.tipo = tipo;
     }
-    return Med;
-}());
-var Orden = /** @class */ (function () {
-    function Orden(pizza, cantidad) {
-        var _this = this;
+}
+class Orden {
+    constructor(Medicina, cantidad) {
         this.valor_detalle = 0.0;
-        this.toString = function () {
-            var espacios = "            ";
-            return "" + _this.medi.tipo + espacios.substring(_this.medi.tipo.length) + _this.cantidad + espacios.substring(String(_this.cantidad).length);
+        this.toString = () => {
+            let espacios = "                       ";
+            return `${this.medi.tipo}${espacios.substring(this.medi.tipo.length)}${this.cantidad}${espacios.substring(String(this.cantidad).length)}`;
         };
-        this.medi = pizza;
+        this.medi = Medicina;
         this.cantidad = cantidad;
         //   this.valor_detalle=this.cantidad*this.medi.precio;
     }
-    return Orden;
-}());
-var Pedido = /** @class */ (function () {
-    function Pedido() {
+}
+class Pedido {
+    constructor() {
         this.ordenes = [];
     }
-    Pedido.prototype.mostrar_ordenes = function () {
-        this.ordenes.forEach(function (orden) {
+    mostrar_ordenes() {
+        this.ordenes.forEach((orden) => {
             console.log(orden.toString());
         });
-    };
+    }
     ;
-    return Pedido;
-}());
-//---------------PREGUNTAS
-// preguntas del menu principal
-var preguntasMenu = [
+}
+let preguntasMenu = [
     {
         type: "list",
         name: "Opciones",
@@ -106,16 +95,16 @@ var preguntasMenu = [
     },
 ];
 // Preguntas del menu secundario
-var login = [
+let login = [
     {
         type: "list",
         name: "sesion",
         message: "Ingreso:",
         choices: ['Admin', 'Cliente'],
-        filter: function (val) { return val.toLowerCase(); }
+        filter: (val) => { return val.toLowerCase(); }
     },
 ];
-var preguntas_login_administrador = [
+let preguntas_login = [
     {
         type: 'input',
         name: 'nickname',
@@ -133,13 +122,13 @@ var preguntas_login_administrador = [
         }
     },
 ];
-var preguntas_crud = [
+let CRUD = [
     {
         type: "list",
         name: "crud_op",
-        message: "Que desea hacer",
+        message: "Escoja una opcion",
         choices: ['Consultar', 'Modificar', 'Eliminar', 'Nueva', 'salir'],
-        validate: function (respuesta) {
+        validate: (respuesta) => {
             if (respuesta.crud_op == 'salir') {
                 return false;
             }
@@ -149,35 +138,35 @@ var preguntas_crud = [
         }
     }
 ];
-var pregunta_actualizar = [
+let actualizar = [
     {
         type: 'input',
         name: "old",
-        message: "Ingrese tipo de medi a actualizar?"
+        message: "Ingrese nombre del medicamento?"
     },
     {
         type: 'input',
         name: "nuevo",
-        message: "Ingrese el nuevo tipo de medi para reemplazar?"
+        message: "Ingrese el nuevo nombre de medicamento?"
     }
 ];
-var pregunta_eliminar = [
+let eliminar = [
     {
         type: "input",
         name: 'borrar',
-        message: "Ingrese tipo de medi a eliminar?",
+        message: "Ingrese nombre de medicamento?",
     }
 ];
-var pregunta_insertar = [
+let insertar = [
     {
         type: "input",
         name: 'insert',
-        message: "Ingrese tipo de medi a insertar?",
+        message: "Ingrese nombre de medicamento:",
     },
     {
         type: 'input',
         name: "saldo",
-        message: "Ingrese el precio de medi para reemplazar?",
+        message: "Ingrese el precio:",
         validate: function (value) {
             var valid = !isNaN(parseFloat(value));
             return valid || "Por favor ingrese un numero valido";
@@ -185,18 +174,18 @@ var pregunta_insertar = [
         filter: Number
     }
 ];
-var preguntas_menu_secundario = [
+let menu_secundario = [
     {
         type: "list",
         name: "clase",
-        message: "Que clase de medi",
+        message: "medicamento",
         choices: medicinalis,
-        filter: function (val) { return val.toLowerCase(); }
+        filter: (val) => { return val.toLowerCase(); }
     },
     {
         type: "input",
         name: "cantidad",
-        message: "Cuantas necesitas",
+        message: "Cantidad",
         validate: function (value) {
             var valid = !isNaN(parseFloat(value));
             return valid || "Por favor ingrese un numero valido";
@@ -206,19 +195,19 @@ var preguntas_menu_secundario = [
     {
         type: "confirm",
         name: "seguir",
-        message: "Desea algo mas?",
+        message: "Nueva compra?",
     },
 ];
 // Ejecutar menu_principal
 function iniciar() {
     inquirer
         .prompt(login)
-        .then(function (respuestas) {
+        .then((respuestas) => {
         if (respuestas.sesion == 'admin') {
             // Menu administrador
             inquirer
-                .prompt(preguntas_login_administrador)
-                .then(function (respuestas) {
+                .prompt(preguntas_login)
+                .then((respuestas) => {
                 if (respuestas.clave) {
                     menu_crud();
                 }
@@ -231,11 +220,11 @@ function iniciar() {
         else {
             inquirer
                 .prompt(preguntasMenu)
-                .then(function (respuestas) {
+                .then((respuestas) => {
                 if (respuestas.opciones != 'Salir') {
                     console.log('Eliga una medi del menu:');
-                    var pedido = new Pedido();
-                    pedir_pizza(pedido);
+                    let pedido = new Pedido();
+                    pedidos(pedido);
                 }
             });
         }
@@ -243,8 +232,8 @@ function iniciar() {
 }
 function menu_crud() {
     inquirer
-        .prompt(preguntas_crud)
-        .then(function (respuestas) {
+        .prompt(CRUD)
+        .then((respuestas) => {
         if (respuestas.crud_op === 'salir') {
             console.log(respuestas.clave);
             iniciar();
@@ -252,33 +241,33 @@ function menu_crud() {
         else {
             switch (respuestas.crud_op) {
                 case 'Consultar':
-                    medicinalis.forEach(function (valor) {
+                    medicinalis.forEach((valor) => {
                         console.log(valor);
                     });
                     break;
                 case 'Modificar':
                     inquirer
-                        .prompt(pregunta_actualizar)
-                        .then(function (respuestas) {
+                        .prompt(actualizar)
+                        .then((respuestas) => {
                         //buscar y reemplazar
-                        medicinalis.forEach(function (element, index, array) {
+                        medicinalis.forEach((element, index, array) => {
                             if (element == String(respuestas.old)) {
                                 console.log('econtrado');
                                 array[index] = respuestas.nuevo;
                             }
-                            console.log(element + "," + respuestas.old);
+                            console.log(`${element},${respuestas.old}`);
                         });
-                        var contenido = '';
-                        var pizza$ = rxjs.from(medicinalis);
+                        let contenido = '';
+                        const pizza$ = rxjs.from(medicinalis);
                         pizza$
-                            .subscribe(function (ok) {
+                            .subscribe((ok) => {
                             contenido = contenido + ok + "||";
-                        }, function (error) {
+                        }, (error) => {
                             console.log("error:", error);
-                        }, function () {
+                        }, () => {
                             // volver a actualizar la base
                             AppendFile('DataBase/medicinas', contenido, true)
-                                .then(function () {
+                                .then(() => {
                                 console.log('contenido actualizado');
                                 menu_crud();
                             });
@@ -287,29 +276,29 @@ function menu_crud() {
                     break;
                 case 'Eliminar':
                     inquirer
-                        .prompt(pregunta_eliminar)
-                        .then(function (respuestas) {
+                        .prompt(eliminar)
+                        .then((respuestas) => {
                         //buscar y reemplazar
-                        medicinalis.forEach(function (element, index, array) {
+                        medicinalis.forEach((element, index, array) => {
                             if (element == String(respuestas.borrar)) {
                                 console.log('econtrado');
                                 array[index] = '';
                             }
-                            console.log(element + "," + respuestas.borrar);
+                            console.log(`${element},${respuestas.borrar}`);
                         });
-                        var contenido = '';
-                        var pizza$ = rxjs.from(medicinalis);
+                        let contenido = '';
+                        const pizza$ = rxjs.from(medicinalis);
                         pizza$
-                            .subscribe(function (ok) {
+                            .subscribe((ok) => {
                             if (ok) {
                                 contenido = contenido + ok + ",";
                             }
-                        }, function (error) {
+                        }, (error) => {
                             console.log("error:", error);
-                        }, function () {
+                        }, () => {
                             // volver a actualizar la base
                             AppendFile('DataBase/medicinas', contenido, true)
-                                .then(function () {
+                                .then(() => {
                                 console.log('contenido actualizado');
                                 menu_crud();
                             });
@@ -318,28 +307,28 @@ function menu_crud() {
                     break;
                 case 'Nueva':
                     inquirer
-                        .prompt(pregunta_insertar)
-                        .then(function (respuestas) {
+                        .prompt(insertar)
+                        .then((respuestas) => {
                         console.log(respuestas);
-                        var res1 = respuestas.insert;
-                        var res2 = respuestas.saldo;
+                        let res1 = respuestas.insert;
+                        let res2 = respuestas.saldo;
                         medicinalis.push(res1 + ',' + res2);
                         //  medicinas.push(res2 + ';');
                         // medicinas.push(respuestas.insert);
                         // medicinas.push(respuestas.saldo);
-                        var contenido = '';
-                        var pizza$ = rxjs.from(medicinalis);
+                        let contenido = '';
+                        const pizza$ = rxjs.from(medicinalis);
                         pizza$
-                            .subscribe(function (ok) {
+                            .subscribe((ok) => {
                             if (ok) {
                                 contenido = contenido + ok + "||";
                             }
-                        }, function (error) {
+                        }, (error) => {
                             console.log("error:", error);
-                        }, function () {
+                        }, () => {
                             // volver a actualizar la base
                             AppendFile('DataBase/medicinas', contenido, true)
-                                .then(function () {
+                                .then(() => {
                                 console.log('contenido actualizado');
                                 menu_crud();
                             });
@@ -351,21 +340,21 @@ function menu_crud() {
         }
     });
 }
-function pedir_pizza(pedido) {
+function pedidos(pedido) {
     inquirer
-        .prompt(preguntas_menu_secundario)
-        .then(function (respuestas) {
-        var pizza = new Med(respuestas.clase);
-        var cantidad = respuestas.cantidad;
-        pedido.ordenes.push(new Orden(pizza, cantidad));
+        .prompt(menu_secundario)
+        .then((respuestas) => {
+        let medicamento = new Med(respuestas.clase);
+        let cantidad = respuestas.cantidad;
+        pedido.ordenes.push(new Orden(medicamento, cantidad));
         if (respuestas.seguir) {
-            pedir_pizza(pedido);
+            pedidos(pedido);
         }
         else {
             console.log('-------------------------------------------' +
                 '\nDetalle de la medicina solicitada\n' +
                 '-----------------------------------------\n' +
-                'Detalle,Precio  Cantidad    \n' +
+                'Detalle,$0.0 Cantidad    \n' +
                 '.............................');
             pedido.mostrar_ordenes();
             console.log("........................");
