@@ -21,33 +21,33 @@ const preguntaBuscarUsuario = [
     {
         type: 'input',
         name: 'idUsuario',
-        message: 'Ingrese ID Medicina',
+        message: 'Ingrese Codigo de la  Medicina',
     }
 ];
 const preguntaUsuario = [
     {
         type: 'input',
         name: 'id',
-        message: 'Cual es tu id'
+        message: 'Cual es el codigo de la medicina'
     },
     {
         type: 'input',
         name: 'nombre',
-        message: 'Cual es tu nombre'
+        message: 'Cual es el nombre de la medicina'
     },
 ];
 const preguntaEdicionUsuario = [
     {
         type: 'input',
         name: 'nombre',
-        message: 'Cual es el nuevo nombre'
+        message: 'Cual es el nuevo nombre de la medicina'
     },
 ];
 function inicialiarBDD() {
     return new Promise((resolve, reject) => {
         fs.readFile('bdd.json', 'utf-8', (error, contenidoArchivo) => {
             if (error) {
-                fs.writeFile('bdd.json', '{"usuarios":[],"mascotas":[]}', (error) => {
+                fs.writeFile('bdd.json', '{"usuarios":[]}', (error) => {
                     if (error) {
                         reject({
                             mensaje: 'Error creando',
@@ -57,7 +57,7 @@ function inicialiarBDD() {
                     else {
                         resolve({
                             mensaje: 'BDD leida',
-                            bdd: JSON.parse('{"usuarios":[],"mascotas":[]}')
+                            bdd: JSON.parse('{"usuarios":[]}')
                         });
                     }
                 });
@@ -202,7 +202,6 @@ function ejecutarAcccion() {
                 else {
                     console.log('Medicina Buscado', respuestaBDD.bdd.usuarios[indice3]);
                     const a = respuestaBDD.bdd.usuarios[indice3];
-                    a.pop();
                     // indice3.splice(respuestaBDD.bdd.usuarios[indice],1)
                 }
                 return respuestaBDD;

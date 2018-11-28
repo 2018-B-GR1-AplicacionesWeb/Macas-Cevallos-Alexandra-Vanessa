@@ -500,7 +500,7 @@ const preguntaBuscarUsuario = [
     {
         type: 'input',
         name: 'idUsuario',
-        message: 'Ingrese ID Medicina',
+        message: 'Ingrese Codigo de la  Medicina',
     }
 ];
 
@@ -508,20 +508,22 @@ const preguntaUsuario = [
     {
         type: 'input',
         name: 'id',
-        message: 'Cual es tu id'
+        message: 'Cual es el codigo de la medicina'
     },
     {
         type: 'input',
         name: 'nombre',
-        message: 'Cual es tu nombre'
+        message: 'Cual es el nombre de la medicina'
     },
+
+
 ];
 
 const preguntaEdicionUsuario = [
     {
         type: 'input',
         name: 'nombre',
-        message: 'Cual es el nuevo nombre'
+        message: 'Cual es el nuevo nombre de la medicina'
     },
 ];
 
@@ -538,7 +540,7 @@ function inicialiarBDD() {
 
                         fs.writeFile(
                             'bdd.json',
-                            '{"usuarios":[],"mascotas":[]}',
+                            '{"usuarios":[]}',
                             (error) => {
                                 if (error) {
                                     reject({
@@ -548,7 +550,7 @@ function inicialiarBDD() {
                                 } else {
                                     resolve({
                                         mensaje: 'BDD leida',
-                                        bdd: JSON.parse('{"usuarios":[],"mascotas":[]}')
+                                        bdd: JSON.parse('{"usuarios":[]}')
                                     })
                                 }
 
@@ -743,8 +745,8 @@ function ejecutarAcccion() {
                         console.log('Medicina Buscado',respuestaBDD.bdd.usuarios[indice3]);
 
 
-                    const  a = respuestaBDD.bdd.usuarios[indice3]
-                          a.pop()
+                    const  a = respuestaBDD.bdd.usuarios[indice3];
+
 
                      // indice3.splice(respuestaBDD.bdd.usuarios[indice],1)
                     }
