@@ -1,366 +1,255 @@
-var inquirer = require('inquirer');
-var rxjs = require('rxjs');
-var fs = require('fs');
-var map = require('rxjs/operators').map;
-var reduce = require('rxjs/operators').reduce;
-var AppendFile = function (nombreArchivo, contenido, replace) {
-    // @ts-ignore
-    return new Promise(function (resolve, reject) {
-        fs.readFile(nombreArchivo, 'utf-8', function (error, contenidoArchivo) {
+const inquirer = require('inquirer');
+const fs = require('fs');
+const rxjs = require('rxjs');
+const timer = require('rxjs').timer;
+const mergeMap = require('rxjs/operators').mergeMap;
+const map = require('rxjs/operators').map;
+const retryWhen = require('rxjs/operators').retryWhen;
+const delayWhen = require('rxjs/operators').delayWhen;
+const preguntaMenu = {
+    type: 'list',
+    name: 'opcionMenu',
+    message: 'Que quieres hacer',
+    choices: [
+        'Crear',
+        'Borrar',
+        'Buscar',
+        'Actualizar',
+    ]
+};
+const preguntaBuscarUsuario = [
+    {
+        type: 'input',
+        name: 'idUsuario',
+        message: 'Ingrese ID Medicina',
+    }
+];
+const preguntaUsuario = [
+    {
+        type: 'input',
+        name: 'id',
+        message: 'Cual es tu id'
+    },
+    {
+        type: 'input',
+        name: 'nombre',
+        message: 'Cual es tu nombre'
+    },
+];
+const preguntaEdicionUsuario = [
+    {
+        type: 'input',
+        name: 'nombre',
+        message: 'Cual es el nuevo nombre'
+    },
+];
+function inicialiarBDD() {
+    return new Promise((resolve, reject) => {
+        fs.readFile('bdd.json', 'utf-8', (error, contenidoArchivo) => {
             if (error) {
-                fs.writeFile(nombreArchivo, contenido, function (error) {
+                fs.writeFile('bdd.json', '{"usuarios":[],"mascotas":[]}', (error) => {
                     if (error) {
-                        reject(error);
+                        reject({
+                            mensaje: 'Error creando',
+                            error: 500
+                        });
                     }
                     else {
-                        resolve(contenido);
+                        resolve({
+                            mensaje: 'BDD leida',
+                            bdd: JSON.parse('{"usuarios":[],"mascotas":[]}')
+                        });
                     }
                 });
             }
             else {
-                fs.writeFile(nombreArchivo, 
-                //contenidoArchivo+contenido,
-                replace == true ? contenido : contenidoArchivo + contenido, function (error) {
-                    if (error) {
-                        reject(error);
-                    }
-                    else {
-                        resolve(contenido);
-                    }
+                resolve({
+                    mensaje: 'BDD leida',
+                    bdd: JSON.parse(contenidoArchivo)
                 });
             }
         });
     });
-};
-// Cargar datos
-var GetData = function (nombreArchivo) {
-    // @ts-ignore
-    return new Promise(function (resolve, reject) {
-        fs.readFile(nombreArchivo, 'utf-8', function (error, contenidoArchivo) {
+}
+async function main() {
+    // 1) Inicializar bdd -- DONE
+    // 2) Preguntas Menu -- DONE
+    // 3) Opciones de Respuesta --  DONE
+    // 4) ACCCION!!!!  -- DONE
+    // 5) Guardar BDD --
+    // of(Cualquier cosa JS)
+    // from(Promesas)
+    const respuestaBDD$ = rxjs.from(inicialiarBDD());
+    respuestaBDD$
+        .pipe(preguntarOpcionesMenu(), opcionesRespuesta(), ejecutarAcccion(), guardarBaseDeDatos())
+        .subscribe((data) => {
+        //
+        console.log(data);
+    }, (error) => {
+        //
+        console.log(error);
+    }, () => {
+        main();
+        console.log('Complete');
+    });
+    /*
+    try {
+        const respuestaInicializarBDD:RespuestaBDD = <RespuestaBDD> await inicialiarBDD();
+        const bdd = respuestaInicializarBDD.bdd;
+        const respuestaMenu = await inquirer.prompt(preguntaMenu);
+        switch (respuestaMenu.opcionMenu) {
+            case 'Crear':
+                // Preguntar datos del nuevo Medicina
+                const medicina = await inquirer.prompt(preguntaUsuario);
+                // CREAR USUARIO
+                bdd.usuarios.push(medicina); // JS
+                const respuestaGuardado = await guardarBDD(bdd);
+                main();
+                break;
+        }
+    } catch (e) {
+        console.error(e)
+    }
+    */
+}
+function guardarBDD(bdd) {
+    return new Promise((resolve, reject) => {
+        fs.writeFile('bdd.json', JSON.stringify(bdd), (error) => {
             if (error) {
-                reject(error);
+                reject({
+                    mensaje: 'Error creando',
+                    error: 500
+                });
             }
             else {
-                resolve(contenidoArchivo);
+                resolve({
+                    mensaje: 'BDD guardada',
+                    bdd: bdd
+                });
             }
         });
     });
-};
-var medicinalis = [];
-GetData('DataBase/medicinas')
-    .then(function (contenido) {
-    String(contenido).split("||").forEach(function (value) {
-        medicinalis.push(value);
+}
+main();
+function preguntarOpcionesMenu() {
+    return mergeMap(// Respuesta Anterior Observable
+    (respuestaBDD) => {
+        return rxjs
+            .from(inquirer.prompt(preguntaMenu))
+            .pipe(map(// respuesta ant obs
+        (respuesta) => {
+            respuestaBDD.opcionMenu = respuesta;
+            return respuestaBDD;
+            // Cualquier cosa JS
+        }));
+        // OBSERVABLE!!!!!!!!!!
     });
-});
-// Entidades
-var Med = /** @class */ (function () {
-    function Med(tipo) {
-        this.tipo = tipo;
-    }
-    return Med;
-}());
-var Orden = /** @class */ (function () {
-    function Orden(Medicina, cantidad) {
-        var _this = this;
-        this.toString = function () {
-            var espacios = "         ";
-            return "" + _this.medi.tipo + espacios.substring(_this.medi.tipo.length) + _this.cantidad + espacios.substring(String(_this.cantidad).length);
-        };
-        this.medi = Medicina;
-        this.cantidad = cantidad;
-        //   this.valor_detalle=this.cantidad*this.medi.precio;
-    }
-    return Orden;
-}());
-var Pedido = /** @class */ (function () {
-    function Pedido() {
-        this.ordenes = [];
-    }
-    Pedido.prototype.mostrar_ordenes = function () {
-        this.ordenes.forEach(function (orden) {
-            console.log(orden.toString());
-        });
-    };
-    ;
-    return Pedido;
-}());
-var preguntasMenu = [
-    {
-        type: "list",
-        name: "Opciones",
-        message: "Que desea hacer?",
-        choices: [
-            "Ordenar medicina",
-            "Salir",
-        ],
-    },
-];
-// Preguntas del menu secundario
-var login = [
-    {
-        type: "list",
-        name: "sesion",
-        message: "Ingreso:",
-        choices: ['Admin', 'Cliente'],
-        filter: function (val) { return val.toLowerCase(); }
-    },
-];
-var preguntas_login = [
-    {
-        type: 'input',
-        name: 'nickname',
-        message: "User",
-    },
-    {
-        type: 'password',
-        message: 'Password:',
-        name: 'clave',
-        validate: function (answer) {
-            if (answer !== '1234') {
-                return 'Password required!';
-            }
-            return true;
+}
+function opcionesRespuesta() {
+    return mergeMap((respuestaBDD) => {
+        const opcion = respuestaBDD.opcionMenu.opcionMenu;
+        switch (opcion) {
+            case 'Crear':
+                return rxjs
+                    .from(inquirer.prompt(preguntaUsuario))
+                    .pipe(map((medicina) => {
+                    respuestaBDD.medicina = medicina;
+                    return respuestaBDD;
+                }));
+            case 'Buscar':
+                return consultarid(respuestaBDD);
+            case 'Actualizar':
+                return preguntarIdUsuario(respuestaBDD);
+            case 'Borrar':
+                return consultarid(respuestaBDD);
         }
-    },
-];
-var CRUD = [
-    {
-        type: "list",
-        name: "crud_op",
-        message: "Escoja una opcion",
-        choices: ['Consultar', 'Modificar', 'Eliminar', 'Nueva', 'salir'],
-        validate: function (respuesta) {
-            if (respuesta.crud_op == 'salir') {
-                return false;
-            }
-            else {
-                return respuesta;
-            }
-        }
-    }
-];
-var actualizar = [
-    {
-        type: 'input',
-        name: "old",
-        message: "Ingrese nombre del medicamento?"
-    },
-    {
-        type: 'input',
-        name: "nuevo",
-        message: "Ingrese el nuevo nombre de medicamento?"
-    }
-];
-var eliminar = [
-    {
-        type: "input",
-        name: 'borrar',
-        message: "Ingrese nombre de medicamento?",
-    }
-];
-var insertar = [
-    {
-        type: "input",
-        name: 'insert',
-        message: "Ingrese nombre de medicamento:",
-    },
-    {
-        type: 'input',
-        name: "saldo",
-        message: "Ingrese el precio:",
-        validate: function (value) {
-            var valid = !isNaN(parseFloat(value));
-            return valid || "Por favor ingrese un numero valido";
-        },
-        filter: Number
-    }
-];
-var menu_secundario = [
-    {
-        type: "list",
-        name: "clase",
-        message: "medicamento",
-        choices: medicinalis,
-        filter: function (val) { return val.toLowerCase(); }
-    },
-    {
-        type: "input",
-        name: "cantidad",
-        message: "Cantidad",
-        validate: function (value) {
-            var valid = !isNaN(parseFloat(value));
-            return valid || "Por favor ingrese un numero valido";
-        },
-        filter: Number
-    },
-    {
-        type: "confirm",
-        name: "seguir",
-        message: "Nueva compra?",
-    },
-];
-// Ejecutar menu_principal
-function iniciar() {
-    inquirer
-        .prompt(login)
-        .then(function (respuestas) {
-        if (respuestas.sesion == 'admin') {
-            // Menu administrador
-            inquirer
-                .prompt(preguntas_login)
-                .then(function (respuestas) {
-                if (respuestas.clave) {
-                    menu_crud();
+    });
+}
+function guardarBaseDeDatos() {
+    return mergeMap(// Respuesta del anterior OBS
+    (respuestaBDD) => {
+        // OBS
+        return rxjs.from(guardarBDD(respuestaBDD.bdd));
+    });
+}
+function ejecutarAcccion() {
+    return map(// Respuesta del anterior OBS
+    (respuestaBDD) => {
+        const opcion = respuestaBDD.opcionMenu.opcionMenu;
+        switch (opcion) {
+            case 'Crear':
+                const medicina = respuestaBDD.medicina;
+                respuestaBDD.bdd.usuarios.push(medicina);
+                return respuestaBDD;
+            case 'Actualizar':
+                const indice1 = respuestaBDD.indiceUsuario;
+                respuestaBDD.bdd.usuarios[indice1].nombre = respuestaBDD.medicina.nombre;
+                return respuestaBDD;
+            case 'Buscar':
+                const indice = respuestaBDD.indiceUsuario;
+                if (indice === -1) {
+                    console.error('error');
                 }
                 else {
-                    console.log(respuestas.clave);
-                    iniciar();
+                    console.log('Medicina Buscado', respuestaBDD.bdd.usuarios[indice]);
                 }
-            });
-        }
-        else {
-            inquirer
-                .prompt(preguntasMenu)
-                .then(function (respuestas) {
-                if (respuestas.opciones != 'Salir') {
-                    console.log('Eliga una medi del menu:');
-                    var pedido = new Pedido();
-                    pedidos(pedido);
+                return respuestaBDD;
+            case 'Borrar':
+                const indice3 = respuestaBDD.indiceUsuario;
+                if (indice3 === -1) {
+                    console.error('error');
                 }
-            });
+                else {
+                    console.log('Medicina Buscado', respuestaBDD.bdd.usuarios[indice3]);
+                    const a = respuestaBDD.bdd.usuarios[indice3];
+                    a.pop();
+                    // indice3.splice(respuestaBDD.bdd.usuarios[indice],1)
+                }
+                return respuestaBDD;
         }
     });
 }
-function menu_crud() {
-    inquirer
-        .prompt(CRUD)
-        .then(function (respuestas) {
-        if (respuestas.crud_op === 'salir') {
-            console.log(respuestas.clave);
-            iniciar();
+function preguntarIdUsuario(respuestaBDD) {
+    return rxjs
+        .from(inquirer.prompt(preguntaBuscarUsuario))
+        .pipe(mergeMap(// RESP ANT OBS
+    (respuesta) => {
+        const indiceUsuario = respuestaBDD.bdd
+            .usuarios
+            .findIndex(// -1
+        (medicina) => {
+            return medicina.id === respuesta.idUsuario;
+        });
+        if (indiceUsuario === -1) {
+            console.log('preguntando de nuevo');
+            return preguntarIdUsuario(respuestaBDD);
         }
         else {
-            switch (respuestas.crud_op) {
-                case 'Consultar':
-                    medicinalis.forEach(function (valor) {
-                        console.log(valor);
-                    });
-                    break;
-                case 'Modificar':
-                    inquirer
-                        .prompt(actualizar)
-                        .then(function (respuestas) {
-                        //buscar y reemplazar
-                        medicinalis.forEach(function (element, index, array) {
-                            if (element == String(respuestas.old)) {
-                                console.log('econtrado');
-                                array[index] = respuestas.nuevo;
-                            }
-                            console.log(element + "," + respuestas.old);
-                        });
-                        var contenido = '';
-                        var pizza$ = rxjs.from(medicinalis);
-                        pizza$
-                            .subscribe(function (ok) {
-                            contenido = contenido + ok + "||";
-                        }, function (error) {
-                            console.log("error:", error);
-                        }, function () {
-                            // volver a actualizar la base
-                            AppendFile('DataBase/medicinas', contenido, true)
-                                .then(function () {
-                                console.log('contenido actualizado');
-                                menu_crud();
-                            });
-                        });
-                    });
-                    break;
-                case 'Eliminar':
-                    inquirer
-                        .prompt(eliminar)
-                        .then(function (respuestas) {
-                        //buscar y reemplazar
-                        medicinalis.forEach(function (element, index, array) {
-                            if (element == String(respuestas.borrar)) {
-                                console.log('econtrado');
-                                array[index] = '';
-                            }
-                            console.log(element + "," + respuestas.borrar);
-                        });
-                        var contenido = '';
-                        var pizza$ = rxjs.from(medicinalis);
-                        pizza$
-                            .subscribe(function (ok) {
-                            if (ok) {
-                                contenido = contenido + ok + ",";
-                            }
-                        }, function (error) {
-                            console.log("error:", error);
-                        }, function () {
-                            // volver a actualizar la base
-                            AppendFile('DataBase/medicinas', contenido, true)
-                                .then(function () {
-                                console.log('contenido actualizado');
-                                menu_crud();
-                            });
-                        });
-                    });
-                    break;
-                case 'Nueva':
-                    inquirer
-                        .prompt(insertar)
-                        .then(function (respuestas) {
-                        console.log(respuestas);
-                        var res1 = respuestas.insert;
-                        var res2 = respuestas.saldo;
-                        medicinalis.push(res1 + ',' + res2);
-                        //  medicinas.push(res2 + ';');
-                        // medicinas.push(respuestas.insert);
-                        // medicinas.push(respuestas.saldo);
-                        var contenido = '';
-                        var pizza$ = rxjs.from(medicinalis);
-                        pizza$
-                            .subscribe(function (ok) {
-                            if (ok) {
-                                contenido = contenido + ok + "||";
-                            }
-                        }, function (error) {
-                            console.log("error:", error);
-                        }, function () {
-                            // volver a actualizar la base
-                            AppendFile('DataBase/medicinas', contenido, true)
-                                .then(function () {
-                                console.log('contenido actualizado');
-                                menu_crud();
-                            });
-                        });
-                    });
-                    break;
-            }
-            //menu_crud();
+            respuestaBDD.indiceUsuario = indiceUsuario;
+            return rxjs
+                .from(inquirer.prompt(preguntaEdicionUsuario))
+                .pipe(map((nombre) => {
+                respuestaBDD.medicina = {
+                    id: null,
+                    nombre: nombre.nombre
+                };
+                return respuestaBDD;
+            }));
         }
-    });
+    }));
 }
-function pedidos(pedido) {
-    inquirer
-        .prompt(menu_secundario)
-        .then(function (respuestas) {
-        var medicamento = new Med(respuestas.clase);
-        var cantidad = respuestas.cantidad;
-        pedido.ordenes.push(new Orden(medicamento, cantidad));
-        if (respuestas.seguir) {
-            pedidos(pedido);
-        }
-        else {
-            console.log('-------------------------------------------' +
-                '\nDetalle de la medicina solicitada\n' +
-                '-----------------------------------------\n' +
-                'Detalle,$0.0 Cantidad    \n' +
-                '.............................');
-            pedido.mostrar_ordenes();
-            console.log("........................");
-        }
-    });
+function consultarid(respuestaBDD) {
+    return rxjs
+        .from(inquirer.prompt(preguntaBuscarUsuario))
+        .pipe(map(// RESP ANT OBS
+    (respuesta) => {
+        const indiceUsuario = respuestaBDD.bdd
+            .usuarios
+            .findIndex(// -1
+        (medicina) => {
+            return medicina.id === respuesta.idUsuario;
+        });
+        respuestaBDD.indiceUsuario = indiceUsuario;
+        return respuestaBDD;
+    }));
 }
-iniciar();
