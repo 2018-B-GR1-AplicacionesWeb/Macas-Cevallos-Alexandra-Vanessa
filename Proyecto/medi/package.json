@@ -1,0 +1,8 @@
+{
+  "name": "pizzeria",
+  "version": "0.0.1",
+  "dependencies": {
+    "inquirer": "^6.2.0",
+    "rxjs": "^6.3.3"
+  }
+}
