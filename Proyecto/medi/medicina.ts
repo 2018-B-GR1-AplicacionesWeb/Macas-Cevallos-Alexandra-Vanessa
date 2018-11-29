@@ -517,6 +517,7 @@ const preguntaUsuario = [
     },
 
 
+
 ];
 
 const preguntaEdicionUsuario = [
@@ -773,6 +774,7 @@ interface BDD {
 interface Medicina {
     id: number;
     nombre: string;
+
 }
 
 
