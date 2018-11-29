@@ -493,6 +493,7 @@ const preguntaMenu = {
         'Borrar',
         'Buscar',
         'Actualizar',
+        'Salir'
     ]
 };
 
@@ -514,6 +515,11 @@ const preguntaUsuario = [
         type: 'input',
         name: 'nombre',
         message: 'Cual es el nombre de la medicina'
+    },
+    {
+        type: 'input',
+        name: 'precio',
+        message: 'Cual es el precio'
     },
 
 
@@ -573,13 +579,6 @@ function inicialiarBDD() {
 
 async function main() {
 
-    // 1) Inicializar bdd -- DONE
-    // 2) Preguntas Menu -- DONE
-    // 3) Opciones de Respuesta --  DONE
-    // 4) ACCCION!!!!  -- DONE
-    // 5) Guardar BDD --
-
-
     // of(Cualquier cosa JS)
     // from(Promesas)
     const respuestaBDD$ = rxjs.from(inicialiarBDD());
@@ -606,26 +605,6 @@ async function main() {
             }
         )
 
-
-    /*
-    try {
-        const respuestaInicializarBDD:RespuestaBDD = <RespuestaBDD> await inicialiarBDD();
-        const bdd = respuestaInicializarBDD.bdd;
-        const respuestaMenu = await inquirer.prompt(preguntaMenu);
-        switch (respuestaMenu.opcionMenu) {
-            case 'Crear':
-                // Preguntar datos del nuevo Medicina
-                const medicina = await inquirer.prompt(preguntaUsuario);
-                // CREAR USUARIO
-                bdd.usuarios.push(medicina); // JS
-                const respuestaGuardado = await guardarBDD(bdd);
-                main();
-                break;
-        }
-    } catch (e) {
-        console.error(e)
-    }
-    */
 }
 
 function guardarBDD(bdd: BDD) {
@@ -744,9 +723,10 @@ function ejecutarAcccion() {
                     }else{
 
                         console.log('Medicina Buscado',respuestaBDD.bdd.usuarios[indice3]);
+                        const a = respuestaBDD.bdd.usuarios
+                        a.splice(respuestaBDD.bdd.usuarios[indice3],1)
 
-
-                    const  a = respuestaBDD.bdd.usuarios[indice3];
+                //    medicina.splice(respuestaBDD.bdd.usuarios[indice3],1);
 
 
                      // indice3.splice(respuestaBDD.bdd.usuarios[indice],1)
@@ -774,7 +754,7 @@ interface BDD {
 interface Medicina {
     id: number;
     nombre: string;
-
+    precio:number;
 }
 
 
@@ -809,9 +789,10 @@ function preguntarIdUsuario(respuestaBDD: RespuestaBDD) {
                             .pipe(
                                 map(
                                     (nombre: { nombre: string }) => {
-                                        respuestaBDD.medicina = {
+                                        respuestaBDD.medicina= {
                                             id: null,
-                                            nombre: nombre.nombre
+                                            nombre: nombre.nombre,
+                                            precio: null
                                         };
                                         return respuestaBDD;
                                     }
