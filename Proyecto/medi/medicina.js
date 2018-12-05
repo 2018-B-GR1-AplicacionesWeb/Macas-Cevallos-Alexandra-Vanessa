@@ -1,12 +1,44 @@
-const inquirer = require('inquirer');
-const fs = require('fs');
-const rxjs = require('rxjs');
-const timer = require('rxjs').timer;
-const mergeMap = require('rxjs/operators').mergeMap;
-const map = require('rxjs/operators').map;
-const retryWhen = require('rxjs/operators').retryWhen;
-const delayWhen = require('rxjs/operators').delayWhen;
-const preguntaMenu = {
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+var inquirer = require('inquirer');
+var fs = require('fs');
+var rxjs = require('rxjs');
+var mergeMap = require('rxjs/operators').mergeMap;
+var map = require('rxjs/operators').map;
+var preguntaMenu = {
     type: 'list',
     name: 'opcionMenu',
     message: 'Que quieres hacer',
@@ -18,14 +50,41 @@ const preguntaMenu = {
         'Salir'
     ]
 };
-const preguntaBuscarUsuario = [
+var preguntaBuscarUsuario = [
     {
         type: 'input',
         name: 'idUsuario',
         message: 'Ingrese Codigo de la  Medicina',
     }
 ];
-const preguntaUsuario = [
+var login = [
+    {
+        type: "list",
+        name: "sesion",
+        message: "Ingreso:",
+        choices: ['Admin', 'Cliente'],
+        filter: function (val) { return val.toLowerCase(); }
+    },
+];
+var preguntas_login = [
+    {
+        type: 'input',
+        name: 'nickname',
+        message: "User",
+    },
+    {
+        type: 'password',
+        message: 'Password:',
+        name: 'clave',
+        validate: function (answer) {
+            if (answer !== '1234') {
+                return 'Password required!';
+            }
+            return true;
+        }
+    },
+];
+var preguntaUsuario = [
     {
         type: 'input',
         name: 'id',
@@ -42,7 +101,7 @@ const preguntaUsuario = [
         message: 'Cual es el precio'
     },
 ];
-const preguntaEdicionUsuario = [
+var preguntaEdicionUsuario = [
     {
         type: 'input',
         name: 'nombre',
@@ -50,10 +109,10 @@ const preguntaEdicionUsuario = [
     },
 ];
 function inicialiarBDD() {
-    return new Promise((resolve, reject) => {
-        fs.readFile('bdd.json', 'utf-8', (error, contenidoArchivo) => {
+    return new Promise(function (resolve, reject) {
+        fs.readFile('bdd.json', 'utf-8', function (error, contenidoArchivo) {
             if (error) {
-                fs.writeFile('bdd.json', '{"usuarios":[]}', (error) => {
+                fs.writeFile('bdd.json', '{"usuarios":[]}', function (error) {
                     if (error) {
                         reject({
                             mensaje: 'Error creando',
@@ -77,26 +136,30 @@ function inicialiarBDD() {
         });
     });
 }
-async function main() {
-    // of(Cualquier cosa JS)
-    // from(Promesas)
-    const respuestaBDD$ = rxjs.from(inicialiarBDD());
-    respuestaBDD$
-        .pipe(preguntarOpcionesMenu(), opcionesRespuesta(), ejecutarAcccion(), guardarBaseDeDatos())
-        .subscribe((data) => {
-        //
-        console.log(data);
-    }, (error) => {
-        //
-        console.log(error);
-    }, () => {
-        main();
-        console.log('Complete');
+function main() {
+    return __awaiter(this, void 0, void 0, function () {
+        var respuestaBDD$;
+        return __generator(this, function (_a) {
+            respuestaBDD$ = rxjs.from(inicialiarBDD());
+            respuestaBDD$
+                .pipe(preguntarOpcionesMenu(), opcionesRespuesta(), ejecutarAcccion(), guardarBaseDeDatos())
+                .subscribe(function (data) {
+                //
+                console.log(data);
+            }, function (error) {
+                //
+                console.log(error);
+            }, function () {
+                main();
+                console.log('Complete');
+            });
+            return [2 /*return*/];
+        });
     });
 }
 function guardarBDD(bdd) {
-    return new Promise((resolve, reject) => {
-        fs.writeFile('bdd.json', JSON.stringify(bdd), (error) => {
+    return new Promise(function (resolve, reject) {
+        fs.writeFile('bdd.json', JSON.stringify(bdd), function (error) {
             if (error) {
                 reject({
                     mensaje: 'Error creando',
@@ -115,11 +178,11 @@ function guardarBDD(bdd) {
 main();
 function preguntarOpcionesMenu() {
     return mergeMap(// Respuesta Anterior Observable
-    (respuestaBDD) => {
+    function (respuestaBDD) {
         return rxjs
             .from(inquirer.prompt(preguntaMenu))
             .pipe(map(// respuesta ant obs
-        (respuesta) => {
+        function (respuesta) {
             respuestaBDD.opcionMenu = respuesta;
             return respuestaBDD;
             // Cualquier cosa JS
@@ -128,13 +191,13 @@ function preguntarOpcionesMenu() {
     });
 }
 function opcionesRespuesta() {
-    return mergeMap((respuestaBDD) => {
-        const opcion = respuestaBDD.opcionMenu.opcionMenu;
+    return mergeMap(function (respuestaBDD) {
+        var opcion = respuestaBDD.opcionMenu.opcionMenu;
         switch (opcion) {
             case 'Crear':
                 return rxjs
                     .from(inquirer.prompt(preguntaUsuario))
-                    .pipe(map((medicina) => {
+                    .pipe(map(function (medicina) {
                     respuestaBDD.medicina = medicina;
                     return respuestaBDD;
                 }));
@@ -149,26 +212,26 @@ function opcionesRespuesta() {
 }
 function guardarBaseDeDatos() {
     return mergeMap(// Respuesta del anterior OBS
-    (respuestaBDD) => {
+    function (respuestaBDD) {
         // OBS
         return rxjs.from(guardarBDD(respuestaBDD.bdd));
     });
 }
 function ejecutarAcccion() {
     return map(// Respuesta del anterior OBS
-    (respuestaBDD) => {
-        const opcion = respuestaBDD.opcionMenu.opcionMenu;
+    function (respuestaBDD) {
+        var opcion = respuestaBDD.opcionMenu.opcionMenu;
         switch (opcion) {
             case 'Crear':
-                const medicina = respuestaBDD.medicina;
+                var medicina = respuestaBDD.medicina;
                 respuestaBDD.bdd.usuarios.push(medicina);
                 return respuestaBDD;
             case 'Actualizar':
-                const indice1 = respuestaBDD.indiceUsuario;
+                var indice1 = respuestaBDD.indiceUsuario;
                 respuestaBDD.bdd.usuarios[indice1].nombre = respuestaBDD.medicina.nombre;
                 return respuestaBDD;
             case 'Buscar':
-                const indice = respuestaBDD.indiceUsuario;
+                var indice = respuestaBDD.indiceUsuario;
                 if (indice === -1) {
                     console.error('error');
                 }
@@ -177,13 +240,13 @@ function ejecutarAcccion() {
                 }
                 return respuestaBDD;
             case 'Borrar':
-                const indice3 = respuestaBDD.indiceUsuario;
+                var indice3 = respuestaBDD.indiceUsuario;
                 if (indice3 === -1) {
                     console.error('error');
                 }
                 else {
                     console.log('Medicina Buscado', respuestaBDD.bdd.usuarios[indice3]);
-                    const a = respuestaBDD.bdd.usuarios;
+                    var a = respuestaBDD.bdd.usuarios;
                     a.splice(respuestaBDD.bdd.usuarios[indice3], 1);
                     //    medicina.splice(respuestaBDD.bdd.usuarios[indice3],1);
                     // indice3.splice(respuestaBDD.bdd.usuarios[indice],1)
@@ -196,11 +259,11 @@ function preguntarIdUsuario(respuestaBDD) {
     return rxjs
         .from(inquirer.prompt(preguntaBuscarUsuario))
         .pipe(mergeMap(// RESP ANT OBS
-    (respuesta) => {
-        const indiceUsuario = respuestaBDD.bdd
+    function (respuesta) {
+        var indiceUsuario = respuestaBDD.bdd
             .usuarios
             .findIndex(// -1
-        (medicina) => {
+        function (medicina) {
             return medicina.id === respuesta.idUsuario;
         });
         if (indiceUsuario === -1) {
@@ -211,7 +274,7 @@ function preguntarIdUsuario(respuestaBDD) {
             respuestaBDD.indiceUsuario = indiceUsuario;
             return rxjs
                 .from(inquirer.prompt(preguntaEdicionUsuario))
-                .pipe(map((nombre) => {
+                .pipe(map(function (nombre) {
                 respuestaBDD.medicina = {
                     id: null,
                     nombre: nombre.nombre,
@@ -226,11 +289,11 @@ function consultarid(respuestaBDD) {
     return rxjs
         .from(inquirer.prompt(preguntaBuscarUsuario))
         .pipe(map(// RESP ANT OBS
-    (respuesta) => {
-        const indiceUsuario = respuestaBDD.bdd
+    function (respuesta) {
+        var indiceUsuario = respuestaBDD.bdd
             .usuarios
             .findIndex(// -1
-        (medicina) => {
+        function (medicina) {
             return medicina.id === respuesta.idUsuario;
         });
         respuestaBDD.indiceUsuario = indiceUsuario;

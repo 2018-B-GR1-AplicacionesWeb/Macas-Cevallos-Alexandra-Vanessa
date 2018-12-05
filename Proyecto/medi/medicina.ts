@@ -478,11 +478,9 @@ declare var require: any;
 const inquirer = require('inquirer');
 const fs = require('fs');
 const rxjs = require('rxjs');
-const timer = require('rxjs').timer;
 const mergeMap = require('rxjs/operators').mergeMap;
 const map = require('rxjs/operators').map;
-const retryWhen = require('rxjs/operators').retryWhen;
-const delayWhen = require('rxjs/operators').delayWhen;
+
 
 const preguntaMenu = {
     type: 'list',
@@ -503,6 +501,35 @@ const preguntaBuscarUsuario = [
         name: 'idUsuario',
         message: 'Ingrese Codigo de la  Medicina',
     }
+];
+let login = [
+    {
+        type: "list",
+        name: "sesion",
+        message: "Ingreso:",
+        choices: ['Admin','Cliente'],
+        filter:( val )=>{ return val.toLowerCase(); }
+    },
+
+];
+
+let preguntas_login = [
+    {
+        type: 'input',
+        name: 'nickname',
+        message: "User",
+    },
+    {
+        type: 'password',
+        message: 'Password:',
+        name: 'clave',
+        validate: function (answer) {
+            if (answer!=='1234') {
+                return 'Password required!';
+            }
+            return true;
+        }
+    },
 ];
 
 const preguntaUsuario = [
@@ -581,6 +608,7 @@ async function main() {
 
     // of(Cualquier cosa JS)
     // from(Promesas)
+
     const respuestaBDD$ = rxjs.from(inicialiarBDD());
 
     respuestaBDD$
@@ -637,6 +665,7 @@ main();
 
 
 function preguntarOpcionesMenu() {
+
     return mergeMap( // Respuesta Anterior Observable
         (respuestaBDD: RespuestaBDD) => {
 
@@ -644,13 +673,16 @@ function preguntarOpcionesMenu() {
                 .from(inquirer.prompt(preguntaMenu))
                 .pipe(
                     map( // respuesta ant obs
-                        (respuesta: OpcionMenu) => {
+                        (respuesta:  OpcionMenu) => {
                             respuestaBDD.opcionMenu = respuesta;
                             return respuestaBDD
                             // Cualquier cosa JS
+
                         }
                     )
+
                 );
+
 
             // OBSERVABLE!!!!!!!!!!
         }
