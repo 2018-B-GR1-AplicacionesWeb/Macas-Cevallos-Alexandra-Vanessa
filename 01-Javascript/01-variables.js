@@ -5,7 +5,7 @@
 /*var edad = 1; // number
 var sueldo = 1.01; // number
 var nombre= "Adrian"; //
-var apellido = 'Eguez'; //
+var nombremed = 'Eguez'; //
 var nombre= `Adrian`; // string
 var casado = false; // booleano
 var hijos = null; // objeto

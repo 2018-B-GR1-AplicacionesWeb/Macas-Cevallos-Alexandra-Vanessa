@@ -1,0 +1,74 @@
+<style>
+    table, th, td {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+</style>
+
+
+<% var nombremed = 'Medicamentos' %>
+<!-- h1 -> Header 1 -->
+<h1>  <%= nombre %> <%= nombremed %>  </h1>
+<!-- p -> parrafo -->
+
+<!-- a -> anchor-->
+<a href="/Medicina/crear">
+    <button>Crear medicina</button>
+</a>
+
+<% if(booleano) { %>
+<!-- p -> parrafo  -->
+<p>Usted creo una medicina, exitosamente</p>
+<% } %>
+
+<h2> Arreglo </h2>
+
+
+
+<table>
+    <!-- tr -> table row -->
+    <tr>
+        <!-- th -> table header -->
+        <th>codigo</th>
+        <th>nombre</th>
+        <th>descripcion</th>
+        <th>fecha</th>
+        <th>Acciones</th>
+    </tr>
+    <!-- tr -> table row -->
+    <% arreglo.forEach((medicina)=>{ %>
+    <tr>
+        <!-- td -> table detail -->
+        <td><%=medicina.codigo%></td>
+        <td><%=medicina.nombre%></td>
+        <td><%=medicina.descripcion%></td>
+        <td><%=medicina.fecha%></td>
+        <td>
+            <form action="/Medicina/borrar/<%=medicina.codigo%>"
+                  method="post"
+            >
+                <!--<button type="button">Yo no</button>-->
+                <!--<button>Yo si</button>-->
+                <button type="submit">Eliminar</button>
+                <% if(booleano) { %>
+                <!-- p -> parrafo  -->
+                <p>Usted borro una medicina, exitosamente</p>
+                <% } %>
+            </form>
+            <a href="/Medicina/actualizar/<%=medicina.codigo%>">
+                <button>Actualizar</button>
+            </a>
+            <% if(booleano) { %>
+            <!-- p -> parrafo  -->
+            <p>Usted actualizo una medicina, exitosamente</p>
+            <% } %>
+        </td>
+    </tr>
+    <% }) %>
+</table>
+
+
+
+
+
+

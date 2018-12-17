@@ -30,12 +30,12 @@ class Usuario {
     public edad?: number | string;
 }
 
-const usuario: Usuario =
+const medicina: Usuario =
     {
         nombre: 'Adrian',
         apellido: 'Eguez'
     };
-usuario.edad = '2';
+medicina.edad = '2';
 
 function sumarDosNumeros(
     numeroUno: number,

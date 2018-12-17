@@ -578,7 +578,7 @@ function inicialiarBDD() {
                             (error) => {
                                 if (error) {
                                     reject({
-                                        mensaje: 'Error creando',
+                                        mensaje: 'Error crear',
                                         error: 500
                                     })
                                 } else {
@@ -644,7 +644,7 @@ function guardarBDD(bdd: BDD) {
                 (error) => {
                     if (error) {
                         reject({
-                            mensaje: 'Error creando',
+                            mensaje: 'Error crear',
                             error: 500
                         })
                     } else {

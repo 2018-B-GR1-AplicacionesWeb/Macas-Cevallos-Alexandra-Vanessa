@@ -53,7 +53,7 @@ const casado = true;
 
 const apellido = '';
 
-// apellido = '123'; Cambiar Strings
+// nombremed = '123'; Cambiar Strings
 
 const edad = 29;
 // edad = 30; Cambiar Number

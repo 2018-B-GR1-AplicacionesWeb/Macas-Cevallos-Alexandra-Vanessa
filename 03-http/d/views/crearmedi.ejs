@@ -1,0 +1,28 @@
+<% var crear = typeof medicina === "undefined" ? true : false;%>
+
+<h1> <%= crear ? 'Crear' : 'Actualizar' %> Medicina</h1>
+<p><%= crear ? 'Creando' : 'Actualizando' %> Medicina.</p>
+<form   action="/Medicina/<%= crear ? 'crear' : 'actualizar' %>-medicina/<%= crear ? '' : medicina.codigo %>"
+        method="POST">
+    <div>
+        <label for="nombre">Nombre</label>
+        <input id="nombre"
+               value="<%= crear ? '' : medicina.nombre %>"
+               name="nombre" type="text">
+    </div>
+
+    <div>
+        <label for="descripcion">Descripcion</label>
+        <textarea name="descripcion"
+                  id="descripcion"
+                  cols="30"
+                  rows="3"><%= crear ? '' : medicina.descripcion %>
+        </textarea>
+    </div>
+    <button type="reset">Resetear formulario</button>
+    <button><%= crear ? 'Crear' : 'Actualizar' %> Medicina</button>
+</form>
+
+<a href="/Medicina/inicio">
+    <button>Regresar</button>
+</a>
